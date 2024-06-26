@@ -9,7 +9,8 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.stereotype.Component;
 
-import audit.AuditEvent; 
+import audit.AuditEvent;
+import processor.service.AuditService; 
 
 @Component
 public class AuditEventReceiver {
@@ -17,12 +18,19 @@ public class AuditEventReceiver {
 	@Autowired
 	private KafkaListenerEndpointRegistry registry;
 	
+	@Autowired
+	private AuditService auditService;
+	
 	private static final Logger logger = LogManager.getLogger(AuditEventReceiver.class);
 	
 	@KafkaListener(topics = "audit-created-event", groupId = "audit-record-created-event")
 	public void handler(AuditEvent auditEvent) throws ParseException {
 
 		logger.info("Auidit event received : " + auditEvent);
+		
+		
+		auditService.save(auditEvent);
+		
 	}
 
 }
